@@ -1945,17 +1945,23 @@
          */
         protected function _set_orm_property($key, $value = null, $expr = false) {
             if (!is_array($key)) {
-                $key = array($key => $value);
+                $key = [$key => $value];
             }
+
             foreach ($key as $field => $value) {
-                $this->_data[$field] = $value;
-                $this->_dirty_fields[$field] = $value;
+                if (!array_key_exists($field, $this->_data) ||
+                    (array_key_exists($field, $this->_data) && $this->_data[$field] !== $value)) {
+                    $this->_data[$field] = $value;
+                    $this->_dirty_fields[$field] = $value;
+                }
                 if (false === $expr and isset($this->_expr_fields[$field])) {
                     unset($this->_expr_fields[$field]);
-                } else if (true === $expr) {
+                } else if (true === $expr)
+                {
                     $this->_expr_fields[$field] = true;
                 }
             }
+
             return $this;
         }
 
